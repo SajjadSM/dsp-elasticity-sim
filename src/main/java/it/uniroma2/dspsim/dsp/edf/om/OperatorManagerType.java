@@ -20,10 +20,13 @@ public enum OperatorManagerType {
     DEEP_TRAJECTORY_BASED_VALUE_ITERATION,
     FA_HYBRID,
     HEINZE,
-    DEEP_HYBRID;
+    DEEP_HYBRID,
+    ENSEMBLE_LEARNING;
 
     public static OperatorManagerType fromString(String str) throws IllegalArgumentException {
-        if (str.equalsIgnoreCase("do-nothing")) {
+        if (str.equalsIgnoreCase("ensemble-learning")) {
+            return ENSEMBLE_LEARNING;
+        } else if (str.equalsIgnoreCase("do-nothing")) {
             return DO_NOTHING;
         } else if (str.equalsIgnoreCase("threshold")) {
             return THRESHOLD_BASED;

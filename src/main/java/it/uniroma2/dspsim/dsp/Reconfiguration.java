@@ -55,6 +55,16 @@ public class Reconfiguration {
 		return instancesToRemove;
 	}
 
+	public int getScalingDirection() {
+		if (instancesToAdd != null)
+			return 1;
+		else if (instancesToRemove != null)
+			return -1;
+		else
+			return 0;
+
+	}
+
 	@Override
 	public String toString() {
 		if (!isReconfiguration())

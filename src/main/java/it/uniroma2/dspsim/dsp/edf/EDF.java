@@ -57,7 +57,7 @@ public class EDF {
 	protected OperatorManager newOperatorManager (Operator op, Configuration configuration) {
 		// get operator manager type from configurations
 		final String omType = configuration.getString(ConfigurationKeys.OM_TYPE_KEY, "qlearning");
-
+		System.out.println("OMType: " + omType);
 		// decode operator manager type
 		// WARNING : could throw IllegalArgumentException
 		OperatorManagerType operatorManagerType = OperatorManagerType.fromString(omType);

@@ -63,7 +63,7 @@ public abstract class RewardBasedOM extends OperatorManager {
         // register statistics
         try {
             this.registerMetrics(Statistics.getInstance());
-        } catch (Statistics.MetricExistsException e ){
+        } catch (Statistics.MetricExistsException e) {
             e.printStackTrace();
         }
     }
@@ -81,9 +81,33 @@ public abstract class RewardBasedOM extends OperatorManager {
     }
 
     @Override
-    public OMRequest pickReconfigurationRequest(OMMonitoringInfo monitoringInfo) {
+    public Action chooseAction(OMMonitoringInfo monitoringInfo) {
         // compute new state
         State currentState = StateUtils.computeCurrentState(monitoringInfo, operator, maxInputRate, inputRateLevels, stateRepresentation);
+        return this.actionSelectionPolicy.selectAction(currentState);
+    }
+
+    @Override
+    public OMRequest pickReconfigurationRequest(OMMonitoringInfo monitoringInfo, Action selectedAction) {
+        // compute new state
+        State currentState = StateUtils.computeCurrentState(monitoringInfo, operator, maxInputRate, inputRateLevels,
+                stateRepresentation);
+
+
+        // output action of ensemble
+        lastChosenAction = selectedAction;
+
+        // update state
+        lastState = currentState;
+
+        return prepareOMRequest(currentState, lastChosenAction);
+    }
+
+    @Override
+    public OMRequest pickReconfigurationRequest(OMMonitoringInfo monitoringInfo) {
+        // compute new state
+        State currentState = StateUtils.computeCurrentState(monitoringInfo, operator, maxInputRate, inputRateLevels,
+                stateRepresentation);
 
         // learning step
         if (lastChosenAction != null) {
@@ -96,6 +120,12 @@ public abstract class RewardBasedOM extends OperatorManager {
         // pick new action
         lastChosenAction = this.actionSelectionPolicy.selectAction(currentState);
 
+        // if (lastChosenAction.getDelta() != 0)
+        // {
+        // lastChosenAction = new Action(lastChosenAction.getIndex(),
+        // lastChosenAction.getDelta(), 0);
+        // lastChosenAction.setDelta(1);
+        // }
         // update state
         lastState = currentState;
 
@@ -129,10 +159,12 @@ public abstract class RewardBasedOM extends OperatorManager {
         if (action.getDelta() != 0)
             cost += wReconf;
 
-        /* we give the OperatorManager a per-operator SLO
-           at the beginning (e.g., each operator gets at most 1/n of the application SLO,
-           where n is the number of operators on a source-sink path.
-        */
+        /*
+         * we give the OperatorManager a per-operator SLO
+         * at the beginning (e.g., each operator gets at most 1/n of the application
+         * SLO,
+         * where n is the number of operators on a source-sink path.
+         */
         if (operator.responseTime(inputRate) > operator.getSloRespTime())
             cost += wSLO;
 
@@ -144,14 +176,15 @@ public abstract class RewardBasedOM extends OperatorManager {
     static public Reconfiguration action2reconfiguration(Action action) {
         int delta = action.getDelta();
 
-        if (delta > 1 || delta < -1) throw new RuntimeException("Unsupported action!");
+        if (delta > 1 || delta < -1)
+            throw new RuntimeException("Unsupported action!");
 
-        if (delta == 0) return Reconfiguration.doNothing();
+        if (delta == 0)
+            return Reconfiguration.doNothing();
 
-        return delta > 0 ?
-                Reconfiguration.scaleOut(
-                        ComputingInfrastructure.getInfrastructure().getNodeTypes()[action.getResTypeIndex()]) :
-                Reconfiguration.scaleIn(
+        return delta > 0 ? Reconfiguration.scaleOut(
+                ComputingInfrastructure.getInfrastructure().getNodeTypes()[action.getResTypeIndex()])
+                : Reconfiguration.scaleIn(
                         ComputingInfrastructure.getInfrastructure().getNodeTypes()[action.getResTypeIndex()]);
     }
 
@@ -164,7 +197,9 @@ public abstract class RewardBasedOM extends OperatorManager {
      */
 
     protected abstract ActionSelectionPolicy initActionSelectionPolicy();
-    protected abstract void useReward(double reward, State lastState, Action lastChosenAction, State currentState, OMMonitoringInfo monitoringInfo);
+
+    protected abstract void useReward(double reward, State lastState, Action lastChosenAction, State currentState,
+            OMMonitoringInfo monitoringInfo);
 
     /**
      * GETTERS
@@ -206,8 +241,7 @@ public abstract class RewardBasedOM extends OperatorManager {
         return stateRepresentation;
     }
 
-    protected void dumpQ()
-    {
+    protected void dumpQ() {
 
     }
 }

@@ -46,6 +46,10 @@ public class Action extends AbstractAction {
         return delta;
     }
 
+    public int setDelta(int newDelta) {
+        return this.delta = newDelta;
+    }
+
     public int getResTypeIndex() {
         return resTypeIndex;
     }

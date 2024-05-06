@@ -4,6 +4,7 @@ import it.uniroma2.dspsim.Configuration;
 import it.uniroma2.dspsim.ConfigurationKeys;
 import it.uniroma2.dspsim.dsp.Operator;
 import it.uniroma2.dspsim.dsp.edf.om.request.OMRequest;
+import it.uniroma2.dspsim.dsp.edf.om.rl.Action;
 import it.uniroma2.dspsim.dsp.queueing.OperatorQueueModel;
 import org.nd4j.linalg.api.ops.Op;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,15 @@ public abstract class OperatorManager {
 		this.operator = operator;
 	}
 
+	public Action chooseAction(OMMonitoringInfo monitoringInfo)
+	{
+		throw new UnsupportedOperationException("Not implemented in sub class.");
+	}
+
+	public OMRequest pickReconfigurationRequest(OMMonitoringInfo monitoringInfo, Action selectedAction)
+	{
+		throw new UnsupportedOperationException("Not implemented in sub class");
+	}
 
 	abstract public OMRequest pickReconfigurationRequest(OMMonitoringInfo monitoringInfo);
 

@@ -2,7 +2,6 @@ package it.uniroma2.dspsim.dsp.edf.om.factory;
 
 import it.uniroma2.dspsim.dsp.Operator;
 import it.uniroma2.dspsim.dsp.edf.om.*;
-import it.uniroma2.dspsim.dsp.edf.om.ThresholdBasedOM;
 
 public class OperatorManagerFactory {
 
@@ -12,6 +11,8 @@ public class OperatorManagerFactory {
     public static OperatorManager createOperatorManager(
             OperatorManagerType operatorManagerType, Operator operator) throws IllegalArgumentException {
         switch (operatorManagerType) {
+            case ENSEMBLE_LEARNING:
+                return new EnsembleLearningOM(operator);
             case DO_NOTHING:
                 return new DoNothingOM(operator);
             case THRESHOLD_BASED:
@@ -28,7 +29,7 @@ public class OperatorManagerFactory {
                 return new QLearningPDSOM(operator);
             case FA_Q_LEARNING:
                 return new FAQLearningOM(operator);
-            case DEEP_Q_LEARNING:
+            case DEEP_Q_LEARNING: 
                 return new DeepQLearningOM(operator);
             case DEEP_V_LEARNING:
                 return new DeepVLearningOM(operator);
