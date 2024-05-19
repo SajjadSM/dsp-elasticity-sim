@@ -83,7 +83,8 @@ public abstract class RewardBasedOM extends OperatorManager {
     @Override
     public Action chooseAction(OMMonitoringInfo monitoringInfo) {
         // compute new state
-        State currentState = StateUtils.computeCurrentState(monitoringInfo, operator, maxInputRate, inputRateLevels, stateRepresentation);
+        State currentState = StateUtils.computeCurrentState(monitoringInfo, operator, maxInputRate, inputRateLevels,
+                stateRepresentation);
         return this.actionSelectionPolicy.selectAction(currentState);
     }
 
@@ -93,6 +94,13 @@ public abstract class RewardBasedOM extends OperatorManager {
         State currentState = StateUtils.computeCurrentState(monitoringInfo, operator, maxInputRate, inputRateLevels,
                 stateRepresentation);
 
+        // learning step
+        if (lastChosenAction != null) {
+            // compute reconfiguration's cost and use it as reward
+            double reward = computeCost(lastChosenAction, currentState, monitoringInfo.getInputRate());
+
+            useReward(reward, lastState, lastChosenAction, currentState, monitoringInfo);
+        }
 
         // output action of ensemble
         lastChosenAction = selectedAction;

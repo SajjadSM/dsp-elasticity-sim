@@ -13,13 +13,14 @@ public class EnsembleLearningOM extends OperatorManager {
 	OperatorManager qLearning;
 	OperatorManager faqLearning;
 	OperatorManager modelBased;
+	int numberOfReconfigs = 0;
 
 	public EnsembleLearningOM(Operator operator) {
 		super(operator);
 
 		qLearning = new QLearningOM(operator);
 		faqLearning = new FAQLearningOM(operator);
-		modelBased = new ModelBasedRLOM(operator);
+		modelBased = new QLearningPDSOM(operator);
 	}
 
 	@Override
@@ -56,7 +57,7 @@ public class EnsembleLearningOM extends OperatorManager {
 		Reconfiguration faqReq = faqLearning.pickReconfigurationRequest(monitoringInfo, chosenAction).getRequestedReconfiguration();
 		Reconfiguration modelBasedReq = modelBased.pickReconfigurationRequest(monitoringInfo, chosenAction).getRequestedReconfiguration();
 
-		return new BasicOMRequest(modelBasedReq);
+		return new BasicOMRequest(qReq);
 
 	}
 
@@ -120,7 +121,7 @@ public class EnsembleLearningOM extends OperatorManager {
 		}
 		if (count > (nums.length / 2))
 			return candidate;
-		return -1;
+		return nums[0];
 
 	}
 }
