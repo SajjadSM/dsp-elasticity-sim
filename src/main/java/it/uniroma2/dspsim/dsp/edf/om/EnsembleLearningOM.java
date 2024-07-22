@@ -11,7 +11,7 @@ import java.util.*;
 public class EnsembleLearningOM extends OperatorManager {
 
 	OperatorManager qLearning;
-	OperatorManager faqLearning;
+	OperatorManager qLearningPDS;
 	OperatorManager modelBased;
 	int numberOfReconfigs = 0;
 
@@ -19,26 +19,26 @@ public class EnsembleLearningOM extends OperatorManager {
 		super(operator);
 
 		qLearning = new QLearningOM(operator);
-		faqLearning = new FAQLearningOM(operator);
-		modelBased = new QLearningPDSOM(operator);
+		qLearningPDS = new QLearningPDSOM(operator);
+		modelBased = new ModelBasedRLOM(operator);
 	}
 
 	@Override
 	public OMRequest pickReconfigurationRequest(OMMonitoringInfo monitoringInfo) {
 
 		Action qAction = qLearning.chooseAction(monitoringInfo);
-		Action faqAction = faqLearning.chooseAction(monitoringInfo);
+		Action pdsAction = qLearningPDS.chooseAction(monitoringInfo);
 		Action modelBasedAction = modelBased.chooseAction(monitoringInfo);
 
 		Action[] actions = {
 				modelBasedAction,
-				faqAction,
+				pdsAction,
 				qAction,
 		};
 
 		int[] actionsDelta = {
 				modelBasedAction.getDelta(),
-				faqAction.getDelta(),
+				pdsAction.getDelta(),
 				qAction.getDelta(),
 		};
 
@@ -54,7 +54,7 @@ public class EnsembleLearningOM extends OperatorManager {
 
 
 		Reconfiguration qReq = qLearning.pickReconfigurationRequest(monitoringInfo, chosenAction).getRequestedReconfiguration();
-		Reconfiguration faqReq = faqLearning.pickReconfigurationRequest(monitoringInfo, chosenAction).getRequestedReconfiguration();
+		Reconfiguration faqReq = qLearningPDS.pickReconfigurationRequest(monitoringInfo, chosenAction).getRequestedReconfiguration();
 		Reconfiguration modelBasedReq = modelBased.pickReconfigurationRequest(monitoringInfo, chosenAction).getRequestedReconfiguration();
 
 		return new BasicOMRequest(qReq);
